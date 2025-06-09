@@ -3,25 +3,23 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Proyecto de Redes</title>
+  <title>Portal Web Proyecto Seguridad en redes TCP/IP Grupo 3</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f6f9;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
       margin: 0;
+      padding: 0;
     }
 
     .container {
-      text-align: center;
+      max-width: 700px;
+      margin: 40px auto;
       background-color: white;
       padding: 40px;
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
     }
 
     img {
@@ -29,8 +27,41 @@
       margin-bottom: 20px;
     }
 
-    h1 {
+    h1,
+    h2 {
       color: #2c3e50;
+    }
+
+    form {
+      text-align: left;
+      margin-top: 30px;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 6px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    input[type="submit"] {
+      background-color: #3498db;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #2980b9;
     }
   </style>
 </head>
@@ -38,8 +69,21 @@
 <body>
   <div class="container">
     <img src="https://umg.edu.gt/img/Umg.png" alt="Logo Universidad">
-    <h1>Proyecto de Redes</h1>
-    <h2>Universidad Mariano Gálvez de Guatemala</h2>
+    <h1>Proyecto de Seguridad en Redes TCP/IP</h1>
+    <h2>Grupo 3</h2>
+    <p>Bienvenido al Portal de Pruebas. Este portal está diseñado para realizar pruebas de seguridad.</p>
+
+    <h2>Formulario de Prueba</h2>
+    <form action="#" method="GET">
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" name="nombre">
+
+      <label for="comentario">Comentario:</label>
+      <textarea id="comentario" name="comentario" rows="4" cols="50"></textarea>
+
+      <input type="submit" value="Enviar">
+    </form>
+  </div>
 </body>
 
 </html>
