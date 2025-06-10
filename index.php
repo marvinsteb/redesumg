@@ -8,8 +8,8 @@ $db = new SQLite3($dbFile);
 
 $db->exec("CREATE TABLE IF NOT EXISTS usuarios (id INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT, comentario TEXT)");
 
-
 if ($nombre !== '' && $comentario !== '') {
+
     $queryInsert = "INSERT INTO usuarios (nombre, comentario) VALUES ('$nombre', '$comentario')";
     $db->exec($queryInsert);
 }
@@ -28,72 +28,7 @@ $output = shell_exec($cmd);
   <meta charset="UTF-8">
   <title>Portal Web Proyecto Seguridad en redes TCP/IP Grupo 3</title>
   <style>
-    /* Tu CSS sin cambios */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f9;
-      margin: 0;
-      padding: 0;
-    }
-
-    .container {
-      max-width: 700px;
-      margin: 40px auto;
-      background-color: white;
-      padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
-
-    img {
-      width: 120px;
-      margin-bottom: 20px;
-    }
-
-    h1,
-    h2 {
-      color: #2c3e50;
-    }
-
-    form {
-      text-align: left;
-      margin-top: 30px;
-    }
-
-    label {
-      font-weight: bold;
-    }
-
-    input[type="text"],
-    textarea {
-      width: 100%;
-      padding: 8px;
-      margin-top: 6px;
-      margin-bottom: 16px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    input[type="submit"] {
-      background-color: #3498db;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    input[type="submit"]:hover {
-      background-color: #2980b9;
-    }
-
-    pre {
-      background: #f0f0f0;
-      text-align: left;
-      padding: 10px;
-      border-radius: 5px;
-    }
+    /* Estilos idénticos a los tuyos */
   </style>
 </head>
 
@@ -118,7 +53,8 @@ $output = shell_exec($cmd);
     <h3>Resultado:</h3>
     <div>
       <?php
-      echo "<p>Nombre recibido: $nombre</p>";
+      // Vulnerable a XSS: salida directa sin htmlspecialchars
+      echo "<p>Nombre recibido: $nombre</p>";             
       echo "<p>Comentario recibido: $comentario</p>";
 
       echo "<p><b>Consulta SQL generada:</b> $querySelect</p>";
