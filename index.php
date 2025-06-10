@@ -28,7 +28,33 @@ $output = shell_exec($cmd);
   <meta charset="UTF-8">
   <title>Portal Web Proyecto Seguridad en redes TCP/IP Grupo 3</title>
   <style>
-    /* Estilos idénticos a los tuyos */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      text-align: center;
+      background-color: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    img {
+      width: 120px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #2c3e50;
+    }
   </style>
 </head>
 
@@ -38,14 +64,14 @@ $output = shell_exec($cmd);
     <h1>Proyecto de Seguridad en Redes TCP/IP</h1>
     <h2>Grupo 3</h2>
     <p>Bienvenido al Portal de Pruebas. Este portal está diseñado para realizar pruebas de seguridad.</p>
-
+    
     <h2>Formulario de Prueba</h2>
     <form action="" method="GET">
-      <label for="nombre">Nombre:</label>
-      <input type="text" id="nombre" name="nombre" value="<?php echo $nombre; ?>">
+      <label for="nombre">Nombre:</label><br>
+      <input type="text" id="nombre" name="nombre" value="<?php echo $nombre; ?>"> <br><br>
 
-      <label for="comentario">Comentario:</label>
-      <textarea id="comentario" name="comentario" rows="4" cols="50"><?php echo $comentario; ?></textarea>
+      <label for="comentario">Comentario:</label><br>
+      <textarea id="comentario" name="comentario" rows="4" cols="50"><?php echo $comentario; ?></textarea><br><br>
 
       <input type="submit" value="Enviar">
     </form>
