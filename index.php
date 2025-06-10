@@ -1,29 +1,44 @@
 <?php
+function limpiarEntrada($data) {
+    return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
+}
 
-$nombre = isset($_GET['nombre']) ? $_GET['nombre'] : '';
-$comentario = isset($_GET['comentario']) ? $_GET['comentario'] : '';
+$nombre = isset($_POST['nombre']) ? limpiarEntrada($_POST['nombre']) : '';
+$comentario = isset($_POST['comentario']) ? limpiarEntrada($_POST['comentario']) : '';
 
 $dbFile = 'basedatos.db';
 $db = new SQLite3($dbFile);
 
-$db->exec("CREATE TABLE IF NOT EXISTS usuarios (id INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT, comentario TEXT)");
+// Crear tabla si no existe
+$db->exec("CREATE TABLE IF NOT EXISTS usuarios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT,
+    comentario TEXT
+)");
 
 if ($nombre !== '' && $comentario !== '') {
-
-    $queryInsert = "INSERT INTO usuarios (nombre, comentario) VALUES ('$nombre', '$comentario')";
-    $db->exec($queryInsert);
+    $stmt = $db->prepare("INSERT INTO usuarios (nombre, comentario) VALUES (:nombre, :comentario)");
+    $stmt->bindValue(':nombre', $nombre, SQLITE3_TEXT);
+    $stmt->bindValue(':comentario', $comentario, SQLITE3_TEXT);
+    $stmt->execute();
 }
 
-$querySelect = "SELECT * FROM usuarios WHERE nombre = '$nombre'";
-$resultado = $db->query($querySelect);
+// Consulta segura
+$stmtSelect = $db->prepare("SELECT * FROM usuarios WHERE nombre = :nombre");
+$stmtSelect->bindValue(':nombre', $nombre, SQLITE3_TEXT);
+$resultado = $stmtSelect->execute();
 
-$cmd = "ping -c 1 $nombre";
-$output = shell_exec($cmd);
+// Validar que el nombre no contenga caracteres peligrosos
+if (preg_match('/^[a-zA-Z0-9\.\-]{1,30}$/', $nombre)) {
+    $cmd = "ping -c 1 " . escapeshellarg($nombre);
+    $output = shell_exec($cmd);
+} else {
+    $cmd = "Comando bloqueado por seguridad.";
+    $output = "Entrada no válida para el comando ping.";
+}
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <title>Portal Web Proyecto Seguridad en redes TCP/IP Grupo 3</title>
@@ -38,7 +53,6 @@ $output = shell_exec($cmd);
       height: 100vh;
       margin: 0;
     }
-
     .container {
       text-align: center;
       background-color: white;
@@ -46,27 +60,24 @@ $output = shell_exec($cmd);
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
-
     img {
       width: 120px;
       margin-bottom: 20px;
     }
-
     h1 {
       color: #2c3e50;
     }
   </style>
 </head>
-
 <body>
   <div class="container">
     <img src="https://umg.edu.gt/img/Umg.png" alt="Logo Universidad">
     <h1>Proyecto de Seguridad en Redes TCP/IP</h1>
     <h2>Grupo 3</h2>
     <p>Bienvenido al Portal de Pruebas. Este portal está diseñado para realizar pruebas de seguridad.</p>
-    
+
     <h2>Formulario de Prueba</h2>
-    <form action="" method="GET">
+    <form action="" method="POST">
       <label for="nombre">Nombre:</label><br>
       <input type="text" id="nombre" name="nombre" value="<?php echo $nombre; ?>"> <br><br>
 
@@ -78,25 +89,24 @@ $output = shell_exec($cmd);
 
     <h3>Resultado:</h3>
     <div>
+      <p><b>Nombre recibido:</b> <?php echo $nombre; ?></p>
+      <p><b>Comentario recibido:</b> <?php echo $comentario; ?></p>
+
+      <p><b>Resultados de la consulta:</b></p>
+      <ul>
       <?php
-      // Vulnerable a XSS: salida directa sin htmlspecialchars
-      echo "<p>Nombre recibido: $nombre</p>";             
-      echo "<p>Comentario recibido: $comentario</p>";
-
-      echo "<p><b>Consulta SQL generada:</b> $querySelect</p>";
-
-      echo "<p><b>Resultados de la consulta:</b></p>";
-      echo "<ul>";
       while ($fila = $resultado->fetchArray(SQLITE3_ASSOC)) {
-          echo "<li>ID: {$fila['id']}, Nombre: {$fila['nombre']}, Comentario: {$fila['comentario']}</li>";
+          $id = htmlspecialchars($fila['id'], ENT_QUOTES, 'UTF-8');
+          $nombreDB = htmlspecialchars($fila['nombre'], ENT_QUOTES, 'UTF-8');
+          $comentarioDB = htmlspecialchars($fila['comentario'], ENT_QUOTES, 'UTF-8');
+          echo "<li>ID: $id, Nombre: $nombreDB, Comentario: $comentarioDB</li>";
       }
-      echo "</ul>";
-
-      echo "<p><b>Comando ejecutado:</b> $cmd</p>";
-      echo "<pre>$output</pre>";
       ?>
+      </ul>
+
+      <p><b>Comando ejecutado:</b> <?php echo htmlspecialchars($cmd, ENT_QUOTES, 'UTF-8'); ?></p>
+      <pre><?php echo htmlspecialchars($output, ENT_QUOTES, 'UTF-8'); ?></pre>
     </div>
   </div>
 </body>
-
 </html>
