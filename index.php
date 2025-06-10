@@ -1,8 +1,7 @@
 <?php
 
-$nombre = $_GET['nombre'] ?? '';
-$comentario = $_GET['comentario'] ?? '';
-
+$nombre = isset($_GET['nombre']) ? $_GET['nombre'] : '';
+$comentario = isset($_GET['comentario']) ? $_GET['comentario'] : '';
 
 $dbFile = 'basedatos.db';
 $db = new SQLite3($dbFile);
@@ -18,7 +17,6 @@ if ($nombre !== '' && $comentario !== '') {
 $querySelect = "SELECT * FROM usuarios WHERE nombre = '$nombre'";
 $resultado = $db->query($querySelect);
 
-
 $cmd = "ping -c 1 $nombre";
 $output = shell_exec($cmd);
 ?>
@@ -30,6 +28,7 @@ $output = shell_exec($cmd);
   <meta charset="UTF-8">
   <title>Portal Web Proyecto Seguridad en redes TCP/IP Grupo 3</title>
   <style>
+    /* Tu CSS sin cambios */
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f6f9;
@@ -119,7 +118,7 @@ $output = shell_exec($cmd);
     <h3>Resultado:</h3>
     <div>
       <?php
-      echo "<p>Nombre recibido: $nombre</p>";             
+      echo "<p>Nombre recibido: $nombre</p>";
       echo "<p>Comentario recibido: $comentario</p>";
 
       echo "<p><b>Consulta SQL generada:</b> $querySelect</p>";
