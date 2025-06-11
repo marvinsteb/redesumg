@@ -10,9 +10,16 @@ function limpiarEntrada($data) {
     return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
 }
 
-if (empty($_SESSION['csrf_token'])) {
-  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+function generarToken($length = 32) {
+  $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  $token = '';
+  for ($i = 0; $i < $length; $i++) {
+      $token .= $chars[mt_rand(0, strlen($chars) - 1)];
+  }
+  return $token;
 }
+
+$_SESSION['csrf_token'] = generarToken(64);
 
 $tokenValido = true;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
