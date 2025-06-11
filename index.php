@@ -1,6 +1,24 @@
 <?php
+session_start();
+
+
+header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:;");
+header("X-Frame-Options: DENY");
+header("X-Content-Type-Options: nosniff");
+header_remove("X-Powered-By"); 
 function limpiarEntrada($data) {
     return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
+}
+
+if (empty($_SESSION['csrf_token'])) {
+  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+$tokenValido = true;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $tokenValido = false;
+    }
 }
 
 $nombre = isset($_POST['nombre']) ? limpiarEntrada($_POST['nombre']) : '';
@@ -9,26 +27,23 @@ $comentario = isset($_POST['comentario']) ? limpiarEntrada($_POST['comentario'])
 $dbFile = 'basedatos.db';
 $db = new SQLite3($dbFile);
 
-// Crear tabla si no existe
 $db->exec("CREATE TABLE IF NOT EXISTS usuarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre TEXT,
     comentario TEXT
 )");
 
-if ($nombre !== '' && $comentario !== '') {
+if ($tokenValido && $nombre !== '' && $comentario !== '') {
     $stmt = $db->prepare("INSERT INTO usuarios (nombre, comentario) VALUES (:nombre, :comentario)");
     $stmt->bindValue(':nombre', $nombre, SQLITE3_TEXT);
     $stmt->bindValue(':comentario', $comentario, SQLITE3_TEXT);
     $stmt->execute();
 }
 
-// Consulta segura
 $stmtSelect = $db->prepare("SELECT * FROM usuarios WHERE nombre = :nombre");
 $stmtSelect->bindValue(':nombre', $nombre, SQLITE3_TEXT);
 $resultado = $stmtSelect->execute();
 
-// Validar que el nombre no contenga caracteres peligrosos
 if (preg_match('/^[a-zA-Z0-9\.\-]{1,30}$/', $nombre)) {
     $cmd = "ping -c 1 " . escapeshellarg($nombre);
     $output = shell_exec($cmd);
@@ -41,43 +56,20 @@ if (preg_match('/^[a-zA-Z0-9\.\-]{1,30}$/', $nombre)) {
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://umg.edu.gt;">
   <title>Portal Web Proyecto Seguridad en redes TCP/IP Grupo 3</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f9;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .container {
-      text-align: center;
-      background-color: white;
-      padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    img {
-      width: 120px;
-      margin-bottom: 20px;
-    }
-    h1 {
-      color: #2c3e50;
-    }
-  </style>
+  <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
   <div class="container">
-    <img src="https://umg.edu.gt/img/Umg.png" alt="Logo Universidad">
+    <img src="Umg.png" alt="Logo Universidad">
     <h1>Proyecto de Seguridad en Redes TCP/IP</h1>
     <h2>Grupo 3</h2>
     <p>Bienvenido al Portal de Pruebas. Este portal está diseñado para realizar pruebas de seguridad.</p>
 
     <h2>Formulario de Prueba</h2>
     <form action="" method="POST">
+      <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
       <label for="nombre">Nombre:</label><br>
       <input type="text" id="nombre" name="nombre" value="<?php echo $nombre; ?>"> <br><br>
 
